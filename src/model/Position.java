@@ -3,6 +3,7 @@ package model;
 import java.util.InputMismatchException;
 
 public class Position {
+
 	private int row;
 	private int column;
 

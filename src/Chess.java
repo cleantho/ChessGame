@@ -12,7 +12,7 @@ public class Chess {
 		
 		p = new Position("h1");
 		System.out.println(p);
-		System.out.println(Position.convertPosition("a1"));
+		System.out.println(Position.convertPosition("a2"));
 		sc.close();
 	}
 
