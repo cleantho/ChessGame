@@ -48,7 +48,7 @@ public class Board {
 		if (!isEmpty(position))
 			throw new BoardException("There is already a piece on position " + position);
 		pieces[position.getRow()][position.getColumn()] = piece;
-		piece.getPosition().setValues(position.getRow(), position.getColumn());
+		piece.setPosition(position);
 	}
 
 	public Piece removePiece(Position position) {

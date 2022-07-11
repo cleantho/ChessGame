@@ -27,10 +27,15 @@ public class Position {
 		return column;
 	}
 
-	public void setValues(int row, int column) {
-		validatePosition(row, column);
+	public boolean setValues(int row, int column) {
+		try {
+			validatePosition(row, column);
+		} catch (InputMismatchException e) {
+			return false;
+		}
 		this.row = row;
 		this.column = column;
+		return true;
 	}
 
 	@Override

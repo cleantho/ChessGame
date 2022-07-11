@@ -1,19 +1,32 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import model.Position;
+import model.ChessMatch;
+import view.Prompt;
 
 public class Chess {
 
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
-		Position p = new Position(7,7);
-		System.out.println(p);
-		System.out.println(Position.convertString(p));
-		
-		p = new Position("h1");
-		System.out.println(p);
-		System.out.println(Position.convertPosition("a2"));
-		sc.close();
+		Prompt UI = new Prompt();
+		ChessMatch match = new ChessMatch();
+		while (true) {
+			UI.printBoard(match);
+			try {
+				System.out.print(" Source: ");
+				String source = UI.readPosition(sc);
+				// UI.printBoard(match);
+				System.out.print(" Target: ");
+				String target = UI.readPosition(sc);
+				if (!match.movePiece(source, target)) {
+					System.out.println("Movement is not allowed.");
+				}
+			} catch (InputMismatchException e) {
+				System.out.println(e.getMessage());
+				sc.nextLine();
+			}
+		}
+		// sc.close();
 	}
 
 }
