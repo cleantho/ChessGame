@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 
 import model.pieces.Pawn;
@@ -8,8 +9,9 @@ import model.pieces.Pawn;
 public class ChessMatch {
 
 	private int turn;
-	private boolean check;
-	private boolean checkMate;
+	// private boolean check;
+	// private boolean checkMate;
+	private Pawn enPassant;
 	private Board board;
 
 	private List<Piece> capturedPieces = new ArrayList<>();
@@ -32,25 +34,64 @@ public class ChessMatch {
 		return capturedPieces;
 	}
 
+	public Color getCurrentPlayer() {
+		return turn % 2 == 0 ? Color.BLACK : Color.WHITE;
+	}
+
+	public boolean isEmpty(String position) {
+		if (board.isEmpty(Position.convertPosition(position))) {
+			throw new InputMismatchException("There is not a piece on position " + position + ". Try again!");
+		}
+		return true;
+	}
+
+	public boolean validatePosition(String position) {
+		Position pos = Position.convertPosition(position);
+		if (board.getPiece(pos).getColor() != getCurrentPlayer()) {
+			throw new ChessException("The chosen piece is not yours.");
+		}
+		if (board.isEmpty(pos)) {
+			throw new ChessException("There is not a piece on position " + position + ".");
+		}
+		if (!board.getPiece(pos).isThereAnyPossibleMove()) {
+			throw new ChessException("There is no possible moves for the chosen piece");
+		}
+		return true;
+	}
+
 	public boolean movePiece(String source, String target) {
 		Position s = new Position(source);
 		Position t = new Position(target);
-		Piece p = board.getPiece(s); 
+		Piece p = board.getPiece(s);
 		boolean[][] possible = p.possibleMoves();
-		for(int i=0; i< board.getRows(); i++) {
-			for(int j=0; j< board.getColumns(); j++) {
-				if(possible[i][j] && t.getRow() == i && t.getColumn() == j) {
-					if(!board.isEmpty(t)) {
+		for (int i = 0; i < board.getRows(); i++) {
+			for (int j = 0; j < board.getColumns(); j++) {
+				if (possible[i][j] && t.getRow() == i && t.getColumn() == j) {
+					if (!board.isEmpty(t)) {
 						capturedPieces.add(board.removePiece(t));
+					} else {
+						if (p instanceof Pawn && (s.getColumn() != t.getColumn())) { // treatment for Enpassant
+							capturedPieces.add(board.removePiece(new Position(s.getRow(), t.getColumn())));
+						}
 					}
+					if (enPassant != null) {
+						enPassant.setEnPassant(false);
+						enPassant = null;
+					} 
+
 					board.addPiece(board.removePiece(s), t);
+					board.getPiece(t).increaseMoveCount();
 					turn++;
+					// treatment for Enpassant
+					if (p instanceof Pawn && (s.getRow() + 2 == t.getRow() || s.getRow() - 2 == t.getRow())) {						
+						((Pawn) p).setEnPassant(true);
+						enPassant = (Pawn) p;
+					}
 					return true;
 				}
 			}
 		}
-		return false;
-		
+		throw new ChessException("The chosen piece can't move to target position.");
 	}
 
 	private void initialSetup() {

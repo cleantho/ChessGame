@@ -53,8 +53,14 @@ public class Position {
 		if (position.length() > 2) {
 			throw new InputMismatchException("Non-existent position value. Valid values are from \"a1\" to \"h8\".");
 		}
-		char letter = position.charAt(0);
-		int digit = position.charAt(1);
+		char letter;
+		int digit;
+		try {
+			letter = position.charAt(0);
+			digit = position.charAt(1);
+		} catch (StringIndexOutOfBoundsException e) {
+			throw new InputMismatchException("Non-existent position value. Valid values are from \"a1\" to \"h8\".");
+		}
 		if (letter < 'a' || letter > 'h' || digit < '1' || digit > '8') {
 			throw new InputMismatchException("Non-existent position value. Valid values are from \"a1\" to \"h8\".");
 		}
