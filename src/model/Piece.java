@@ -35,6 +35,14 @@ public abstract class Piece {
 		return board;
 	}
 	
+	public boolean isThereOpponentPiece(Position position) {
+		if(getBoard().isEmpty(position)) {
+			return false;
+		}
+		Piece p = getBoard().getPiece(position);
+		return color != p.getColor();
+	}
+	
 	public abstract boolean[][] possibleMoves();
 	
 	public boolean isThereAnyPossibleMove() {

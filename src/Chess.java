@@ -8,6 +8,7 @@ import view.Prompt;
 public class Chess {
 
 	public static void main(String[] args) throws InterruptedException {
+		int delay = 1200;
 		Scanner sc = new Scanner(System.in);
 		Prompt UI = new Prompt();
 		ChessMatch match = new ChessMatch();
@@ -19,28 +20,33 @@ public class Chess {
 					UI.leave(match);
 					break;
 				}
-				match.validatePosition(source);				
+				match.validatePosition(source);	
+				String target = "";
 				boolean wrong = true;
 				do {
 					try {
 						UI.printBoard(match, source);
-						String target = UI.readPosition(sc);						
+						target = UI.readPosition(sc);						
 						match.movePiece(source, target);
 						wrong = false;
 					} catch (InputMismatchException e) {
 						UI.printError(e.getMessage());
-						Thread.sleep(3000);						
+						Thread.sleep(delay);						
 					} catch (ChessException e) {
 						UI.printError(e.getMessage());
-						Thread.sleep(3000);						
+						Thread.sleep(delay);						
 					}
-				} while (wrong);				
+				} while (wrong);
+				if (match.isPromoted()) {
+					String type = UI.promotionOption(sc);
+					match.replacePromotedPiece(type, target);
+				}
 			} catch (InputMismatchException e) {
 				UI.printError(e.getMessage());
-				Thread.sleep(3000);				
+				Thread.sleep(delay);				
 			} catch (ChessException e) {
 				UI.printError(e.getMessage());
-				Thread.sleep(3000);				
+				Thread.sleep(delay);				
 			}
 		}
 		sc.close();

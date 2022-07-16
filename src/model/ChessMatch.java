@@ -4,7 +4,12 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 
+import model.pieces.Bishop;
+import model.pieces.King;
+import model.pieces.Knight;
 import model.pieces.Pawn;
+import model.pieces.Queen;
+import model.pieces.Rook;
 
 public class ChessMatch {
 
@@ -12,6 +17,7 @@ public class ChessMatch {
 	// private boolean check;
 	// private boolean checkMate;
 	private Pawn enPassant;
+	private boolean promoted;
 	private Board board;
 
 	private List<Piece> capturedPieces = new ArrayList<>();
@@ -24,6 +30,10 @@ public class ChessMatch {
 
 	public int getTurn() {
 		return turn;
+	}
+
+	public boolean isPromoted() {
+		return promoted;
 	}
 
 	public Board getBoard() {
@@ -47,15 +57,32 @@ public class ChessMatch {
 
 	public boolean validatePosition(String position) {
 		Position pos = Position.convertPosition(position);
-		if (board.getPiece(pos).getColor() != getCurrentPlayer()) {
-			throw new ChessException("The chosen piece is not yours.");
-		}
 		if (board.isEmpty(pos)) {
 			throw new ChessException("There is not a piece on position " + position + ".");
+		}
+		if (board.getPiece(pos).getColor() != getCurrentPlayer()) {
+			throw new ChessException("The chosen piece is not yours.");
 		}
 		if (!board.getPiece(pos).isThereAnyPossibleMove()) {
 			throw new ChessException("There is no possible moves for the chosen piece");
 		}
+		return true;
+	}
+
+	public boolean replacePromotedPiece(String type, String target) {
+		Position t = new Position(target);
+		Piece p = board.getPiece(t);
+		if (type.equals("R"))
+			p = new Rook(p.getColor(), board);
+		else if (type.equals("B"))
+			p = new Bishop(p.getColor(), board);
+		else if (type.equals("N"))
+			p = new Knight(p.getColor(), board);
+		else
+			p = new Queen(p.getColor(), board);
+		board.removePiece(t);
+		board.addPiece(p, t);
+		promoted = false;
 		return true;
 	}
 
@@ -74,19 +101,24 @@ public class ChessMatch {
 							capturedPieces.add(board.removePiece(new Position(s.getRow(), t.getColumn())));
 						}
 					}
+					// treatment for Enpassant
 					if (enPassant != null) {
 						enPassant.setEnPassant(false);
 						enPassant = null;
-					} 
-
-					board.addPiece(board.removePiece(s), t);
-					board.getPiece(t).increaseMoveCount();
-					turn++;
-					// treatment for Enpassant
-					if (p instanceof Pawn && (s.getRow() + 2 == t.getRow() || s.getRow() - 2 == t.getRow())) {						
+					}
+					if (p instanceof Pawn && (s.getRow() + 2 == t.getRow() || s.getRow() - 2 == t.getRow())) {
 						((Pawn) p).setEnPassant(true);
 						enPassant = (Pawn) p;
 					}
+					// end - treatment for Enpassant
+					// treatment for Promotion
+					if (p instanceof Pawn && (t.getRow() == 0 || t.getRow() == 7)) {
+						promoted = true;
+					}
+					// end - treatment for Promotion
+					board.addPiece(board.removePiece(s), t);
+					board.getPiece(t).increaseMoveCount();
+					turn++;
 					return true;
 				}
 			}
@@ -95,6 +127,15 @@ public class ChessMatch {
 	}
 
 	private void initialSetup() {
+		board.addPiece(new Rook(Color.BLACK, board), new Position("a8"));
+		board.addPiece(new Knight(Color.BLACK, board), new Position("b8"));
+		board.addPiece(new Bishop(Color.BLACK, board), new Position("c8"));
+		board.addPiece(new Queen(Color.BLACK, board), new Position("d8"));
+		board.addPiece(new King(Color.BLACK, board), new Position("e8"));
+		board.addPiece(new Bishop(Color.BLACK, board), new Position("f8"));
+		board.addPiece(new Knight(Color.BLACK, board), new Position("g8"));
+		board.addPiece(new Rook(Color.BLACK, board), new Position("h8"));
+
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("a7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("b7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("c7"));
@@ -112,6 +153,15 @@ public class ChessMatch {
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("f2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("g2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("h2"));
+
+		board.addPiece(new Rook(Color.WHITE, board), new Position("a1"));
+		board.addPiece(new Knight(Color.WHITE, board), new Position("b1"));
+		board.addPiece(new Bishop(Color.WHITE, board), new Position("c1"));
+		board.addPiece(new Queen(Color.WHITE, board), new Position("d1"));
+		board.addPiece(new King(Color.WHITE, board), new Position("e1"));
+		board.addPiece(new Bishop(Color.WHITE, board), new Position("f1"));
+		board.addPiece(new Knight(Color.WHITE, board), new Position("g1"));
+		board.addPiece(new Rook(Color.WHITE, board), new Position("h1"));
 	}
 
 }

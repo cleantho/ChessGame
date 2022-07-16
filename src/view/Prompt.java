@@ -41,13 +41,13 @@ public class Prompt {
 		}
 		return in;
 	}
-	
+
 	public void leave(ChessMatch match) {
 		String win = match.getCurrentPlayer() == Color.WHITE ? "\n  BLACK WIN!  " : "\n  WHITE WIN!  ";
 		System.out.println(ANSI_BLUE_BACKGROUND + win);
 		System.out.println(ANSI_GREEN + " Game Over!!! " + ANSI_RESET);
 	}
-	
+
 	private static void ClearConsole() {
 		System.out.print("\033[H\033[2J");
 		System.out.flush();
@@ -94,7 +94,7 @@ public class Prompt {
 		printCapturePieces(match.getCapturedPieces());
 		printMatch(match);
 
-		if (source == "") {			
+		if (source == "") {
 			System.out.println(" To leave the game press \"x\".");
 			System.out.print(" Source: ");
 		} else {
@@ -119,7 +119,7 @@ public class Prompt {
 		List<Piece> white = pieces.stream().filter(x -> x.getColor() == Color.WHITE).collect(Collectors.toList());
 		List<Piece> black = pieces.stream().filter(x -> x.getColor() == Color.BLACK).collect(Collectors.toList());
 		System.out.println("\n Captured Pieces");
-		System.out.print("  White: " + ANSI_CYAN_BACKGROUND + ANSI_BLACK);
+		System.out.print("  White: " + ANSI_CYAN_BACKGROUND + ANSI_WHITE);
 		System.out.println(Arrays.toString(white.toArray()));
 		System.out.print(ANSI_RESET + "  Black: " + ANSI_YELLOW_BACKGROUND + ANSI_BLACK);
 		System.out.println(Arrays.toString(black.toArray()));
@@ -133,6 +133,27 @@ public class Prompt {
 
 	public void printError(String e) {
 		System.out.print(" " + Prompt.ANSI_RED + e + Prompt.ANSI_RESET);
+	}
+
+	public String promotionOption(Scanner sc) {
+		String type;
+		boolean repeat;
+		int count = 0;
+		do {
+			System.out.print("Choose a piece to exchange the pawn (Q, B, N, R): ");
+			type = sc.nextLine().toUpperCase();
+			if (!type.equals("Q") && !type.equals("B") && !type.equals("N") && !type.equals("R")) {
+				System.out.println("Invalid option!");
+				repeat = true;
+				if (++count == 3) {
+					repeat = false;
+					type = "Q";
+				}
+			} else {
+				repeat = false;
+			}
+		} while (repeat);
+		return type;
 	}
 
 }
