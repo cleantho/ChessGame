@@ -43,9 +43,9 @@ public class Prompt {
 	}
 
 	public void leave(ChessMatch match) {
-		String win = match.getCurrentPlayer() == Color.WHITE ? "\n  BLACK WIN!  " : "\n  WHITE WIN!  ";
-		System.out.println(ANSI_BLUE_BACKGROUND + win);
-		System.out.println(ANSI_GREEN + " Game Over!!! " + ANSI_RESET);
+		String win = match.getCurrentPlayer() == Color.WHITE ? "  BLACK WIN!  " : "  WHITE WIN!  ";
+		System.out.println("\n "+ ANSI_BLUE_BACKGROUND + win + ANSI_RESET);
+		System.out.println(" "+ ANSI_BLUE_BACKGROUND + ANSI_GREEN + " Game Over!!! " + ANSI_RESET);
 	}
 
 	private static void ClearConsole() {
@@ -66,9 +66,9 @@ public class Prompt {
 		}
 		int rc = match.getBoard().getRows();
 		String background;
-		System.out.println("     " + ANSI_BLUE_BACKGROUND + "                            " + ANSI_RESET);
+		System.out.println(" " + ANSI_BLUE_BACKGROUND + "                            " + ANSI_RESET);
 		for (int i = 0; i < rc; i++) {
-			System.out.print("     " + ANSI_BLUE_BACKGROUND + ANSI_GREEN + " " + (rc - i) + ANSI_RESET);
+			System.out.print(" " + ANSI_BLUE_BACKGROUND + ANSI_GREEN + " " + (rc - i) + ANSI_RESET);
 			for (int j = 0; j < rc; j++) {
 				if (i % 2 != 0) {
 					if (j % 2 == 0) {
@@ -90,7 +90,7 @@ public class Prompt {
 			}
 			System.out.println(ANSI_BLUE_BACKGROUND + "  " + ANSI_RESET);
 		}
-		System.out.println("     " + ANSI_BLUE_BACKGROUND + ANSI_GREEN + "   a  b  c  d  e  f  g  h   " + ANSI_RESET);
+		System.out.println(" " + ANSI_BLUE_BACKGROUND + ANSI_GREEN + "   a  b  c  d  e  f  g  h   " + ANSI_RESET);
 		printCapturePieces(match.getCapturedPieces());
 		printMatch(match);
 
@@ -127,12 +127,15 @@ public class Prompt {
 	}
 
 	public void printMatch(ChessMatch match) {
+		if (match.isCheck()) {
+			System.out.println(" " + ANSI_BLUE_BACKGROUND + " CHECK!!! " + ANSI_RESET);
+		}
 		System.out.println(" Turn: " + match.getTurn());
 		System.out.println(" Waiting player: " + match.getCurrentPlayer() + "\n");
 	}
 
 	public void printError(String e) {
-		System.out.print(" " + Prompt.ANSI_RED + e + Prompt.ANSI_RESET);
+		System.out.print(" " + ANSI_RED + e + ANSI_RESET);
 	}
 
 	public String promotionOption(Scanner sc) {
@@ -140,10 +143,10 @@ public class Prompt {
 		boolean repeat;
 		int count = 0;
 		do {
-			System.out.print("Choose a piece to exchange the pawn (Q, B, N, R): ");
+			System.out.print(" Choose a piece to exchange the pawn (Q, B, N, R): ");
 			type = sc.nextLine().toUpperCase();
 			if (!type.equals("Q") && !type.equals("B") && !type.equals("N") && !type.equals("R")) {
-				System.out.println("Invalid option!");
+				System.out.println(" Invalid option!");
 				repeat = true;
 				if (++count == 3) {
 					repeat = false;

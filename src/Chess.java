@@ -8,10 +8,10 @@ import view.Prompt;
 public class Chess {
 
 	public static void main(String[] args) throws InterruptedException {
-		int delay = 1200;
 		Scanner sc = new Scanner(System.in);
 		Prompt UI = new Prompt();
 		ChessMatch match = new ChessMatch();
+		int delay = 1200;
 		while (true) {
 			try {
 				UI.printBoard(match);
@@ -22,13 +22,12 @@ public class Chess {
 				}
 				match.validatePosition(source);	
 				String target = "";
-				boolean wrong = true;
 				do {
 					try {
 						UI.printBoard(match, source);
 						target = UI.readPosition(sc);						
 						match.movePiece(source, target);
-						wrong = false;
+						break;
 					} catch (InputMismatchException e) {
 						UI.printError(e.getMessage());
 						Thread.sleep(delay);						
@@ -36,7 +35,7 @@ public class Chess {
 						UI.printError(e.getMessage());
 						Thread.sleep(delay);						
 					}
-				} while (wrong);
+				} while (true);
 				if (match.isPromoted()) {
 					String type = UI.promotionOption(sc);
 					match.replacePromotedPiece(type, target);

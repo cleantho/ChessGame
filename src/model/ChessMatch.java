@@ -14,22 +14,27 @@ import model.pieces.Rook;
 public class ChessMatch {
 
 	private int turn;
-	// private boolean check;
+	private boolean check;
 	// private boolean checkMate;
-	private Pawn enPassant;
 	private boolean promoted;
+	private Piece enPassant;
 	private Board board;
 
 	private List<Piece> capturedPieces = new ArrayList<>();
+	private King[] kings = new King[2];
 
 	public ChessMatch() {
-		board = new Board(64);
+		board = new Board();
 		turn = 1;
 		initialSetup();
 	}
 
 	public int getTurn() {
 		return turn;
+	}
+
+	public boolean isCheck() {
+		return check;
 	}
 
 	public boolean isPromoted() {
@@ -94,6 +99,7 @@ public class ChessMatch {
 		for (int i = 0; i < board.getRows(); i++) {
 			for (int j = 0; j < board.getColumns(); j++) {
 				if (possible[i][j] && t.getRow() == i && t.getColumn() == j) {
+
 					if (!board.isEmpty(t)) {
 						capturedPieces.add(board.removePiece(t));
 					} else {
@@ -103,12 +109,12 @@ public class ChessMatch {
 					}
 					// treatment for Enpassant
 					if (enPassant != null) {
-						enPassant.setEnPassant(false);
+						((Pawn) enPassant).setEnPassant(false);
 						enPassant = null;
 					}
 					if (p instanceof Pawn && (s.getRow() + 2 == t.getRow() || s.getRow() - 2 == t.getRow())) {
 						((Pawn) p).setEnPassant(true);
-						enPassant = (Pawn) p;
+						enPassant = p;
 					}
 					// end - treatment for Enpassant
 					// treatment for Promotion
@@ -119,10 +125,17 @@ public class ChessMatch {
 					board.addPiece(board.removePiece(s), t);
 					board.getPiece(t).increaseMoveCount();
 					turn++;
+					// put opponent king in check
+					if(p.getColor() == Color.WHITE) {
+						check = kings[0].inCheck();
+					}else {
+						check = kings[1].inCheck();
+					}					
 					return true;
 				}
 			}
 		}
+
 		throw new ChessException("The chosen piece can't move to target position.");
 	}
 
@@ -141,7 +154,7 @@ public class ChessMatch {
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("c7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("d7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("e7"));
-		board.addPiece(new Pawn(Color.BLACK, board), new Position("f7"));
+		//board.addPiece(new Pawn(Color.BLACK, board), new Position("f7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("g7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("h7"));
 
@@ -149,7 +162,7 @@ public class ChessMatch {
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("b2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("c2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("d2"));
-		board.addPiece(new Pawn(Color.WHITE, board), new Position("e2"));
+		//board.addPiece(new Pawn(Color.WHITE, board), new Position("e2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("f2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("g2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("h2"));
@@ -162,6 +175,9 @@ public class ChessMatch {
 		board.addPiece(new Bishop(Color.WHITE, board), new Position("f1"));
 		board.addPiece(new Knight(Color.WHITE, board), new Position("g1"));
 		board.addPiece(new Rook(Color.WHITE, board), new Position("h1"));
+
+		kings[0] = (King) board.getPiece(Position.convertPosition("e8"));
+		kings[1] = (King) board.getPiece(Position.convertPosition("e1"));
 	}
 
 }

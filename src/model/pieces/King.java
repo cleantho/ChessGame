@@ -21,43 +21,31 @@ public class King extends Piece {
 		boolean[][] positions = new boolean[board.getRows()][board.getColumns()];
 		int row = getPosition().getRow();
 		int column = getPosition().getColumn();
-		int left = -1, right = 1, above = -1, below = 1;
-
-		// above
+		int[] r = { -1, 1, 0, 0, -1, -1, 1, 1 };
+		int[] c = { 0, 0, -1, 1, -1, 1, -1, 1 };
 		Position p = new Position(row, column);
-		if (p.setValues(row + above, column) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row + above][column] = true;
+		for (int i = 0; i < r.length; i++) {
+			if (p.setValues(row + r[i], column + c[i]) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
+				positions[row + r[i]][column + c[i]] = true;
+			}
 		}
-		// below
-		if (p.setValues(row + below, column) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[p.getRow()][column] = true;
-		}
-		// left
-		if (p.setValues(row, column + left) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row][column + left] = true;
-		}
-		// right
-		if (p.setValues(row, column + right) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row][column + right] = true;
-		}
-		// north-west
-		if (p.setValues(row + above, column + left) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row + above][column + left] = true;
-		}
-		// north-east
-		if (p.setValues(row + above, column + right) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row + above][column + right] = true;
-		}
-		// south-west
-		if (p.setValues(row + below, column + left) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row + below][column + left] = true;
-		}
-		// south-east
-		if (p.setValues(row + below, column + right) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row + below][column + right] = true;
-		}
-
 		return positions;
 	}
 
+	public boolean inCheck() {
+		int row = getPosition().getRow();
+		int column = getPosition().getColumn();
+		Piece[][] pieces = board.getPieces();
+		for (int i = 0; i < board.getRows(); i++) {
+			for (int j = 0; j < board.getColumns(); j++) {
+				if (pieces[i][j] != null && pieces[i][j].getColor() != getColor()) {
+					boolean[][] possible = pieces[i][j].possibleMoves();
+					if (possible[row][column]) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 }

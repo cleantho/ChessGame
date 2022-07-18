@@ -6,14 +6,7 @@ public class Board {
 	private int columns;
 	private Piece[][] pieces;
 	
-	public Board() {
-		this(64);
-	}
-
-	public Board(int houses) {
-		if (houses != 64) {
-			throw new BoardException("Error creating board: there must be 64.");
-		}
+	public Board() {		
 		rows = columns = 8;
 		pieces = new Piece[rows][columns];
 	}

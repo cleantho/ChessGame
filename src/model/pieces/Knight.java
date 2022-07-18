@@ -21,36 +21,13 @@ public class Knight extends Piece {
 		boolean[][] positions = new boolean[board.getRows()][board.getColumns()];
 		int row = getPosition().getRow();
 		int column = getPosition().getColumn();
-		int left = -1, right = 1, above = -1, below = 1;
-
-		// above
+		int[] r = { -2, -2, 2, 2, -1, 1, -1, 1 };
+		int[] c = { -1, 1, -1, 1, -2, -2, 2, 2 };
 		Position p = new Position(row, column);
-		if (p.setValues(row + above + above, column + left) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row + above + above][column + left] = true;
-		}
-		if (p.setValues(row + above + above, column + right) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row + above + above][column + right] = true;
-		}
-		// below
-		if (p.setValues(row + below + below, column + left) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row + below + below][column + left] = true;
-		}
-		if (p.setValues(row + below + below, column + right) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row + below + below][column + right] = true;
-		}
-		// left
-		if (p.setValues(row + above, column + left + left) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row + above][column + left + left] = true;
-		}
-		if (p.setValues(row + below, column + left + left) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row + below][column + left + left] = true;
-		}
-		// right
-		if (p.setValues(row + above, column + right + right) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row + above][column + right + right] = true;
-		}
-		if (p.setValues(row + below, column + right + right) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-			positions[row + below][column + right + right] = true;
+		for (int i = 0; i < r.length; i++) {
+			if (p.setValues(row + r[i], column + c[i]) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
+				positions[row + r[i]][column + c[i]] = true;
+			}
 		}
 		return positions;
 	}
