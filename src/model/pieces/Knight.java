@@ -19,14 +19,18 @@ public class Knight extends Piece {
 	@Override
 	public boolean[][] possibleMoves() {
 		boolean[][] positions = new boolean[board.getRows()][board.getColumns()];
-		int row = getPosition().getRow();
-		int column = getPosition().getColumn();
+		int row = position.getRow();
+		int column = position.getColumn();
 		int[] r = { -2, -2, 2, 2, -1, 1, -1, 1 };
 		int[] c = { -1, 1, -1, 1, -2, -2, 2, 2 };
 		Position p = new Position(row, column);
 		for (int i = 0; i < r.length; i++) {
-			if (p.setValues(row + r[i], column + c[i]) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
-				positions[row + r[i]][column + c[i]] = true;
+			if (p.setValues(row + r[i], column + c[i]) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {				
+				if (isMyKingInCheck(p)) {
+					positions[p.getRow()][p.getColumn()] = false;
+				} else {
+					positions[p.getRow()][p.getColumn()] = true;
+				}
 			}
 		}
 		return positions;

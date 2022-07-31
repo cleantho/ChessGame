@@ -34,23 +34,21 @@ public class Prompt {
 	public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
 	public static final String ANSI_BRIGHT_YELLOW_BACK = "\u001B[103m";
 
-	public String readPosition(Scanner sc) throws InputMismatchException {
-		String in = sc.nextLine().toLowerCase();
-		if (!in.equals("x")) {
-			Position.validatePosition(in);
-		}
-		return in;
-	}
-
-	public void leave(ChessMatch match) {
-		String win = match.getCurrentPlayer() == Color.WHITE ? "  BLACK WIN!  " : "  WHITE WIN!  ";
-		System.out.println("\n "+ ANSI_BLUE_BACKGROUND + win + ANSI_RESET);
-		System.out.println(" "+ ANSI_BLUE_BACKGROUND + ANSI_GREEN + " Game Over!!! " + ANSI_RESET);
-	}
+	private boolean abandon = false;
 
 	private static void ClearConsole() {
 		System.out.print("\033[H\033[2J");
 		System.out.flush();
+	}
+
+	public String readPosition(Scanner sc) throws InputMismatchException {
+		String in = sc.nextLine().toLowerCase();
+		if (in.equals("x")) {
+			abandon = true;
+		} else {
+			Position.validatePosition(in);
+		}
+		return in;
 	}
 
 	public void printBoard(ChessMatch match) {
@@ -93,18 +91,25 @@ public class Prompt {
 		System.out.println(" " + ANSI_BLUE_BACKGROUND + ANSI_GREEN + "   a  b  c  d  e  f  g  h   " + ANSI_RESET);
 		printCapturePieces(match.getCapturedPieces());
 		printMatch(match);
-
-		if (source == "") {
-			System.out.println(" To leave the game press \"x\".");
-			System.out.print(" Source: ");
-		} else {
-			System.out.println(" Source: " + source);
-			System.out.print(" Target: ");
+		if (!match.isCheckMate()) {
+			if (source == "") {
+				System.out.println(" To leave the game press \"x\".");
+				if (abandon) {
+					System.out.print(" Source: x");
+				} else {
+					System.out.print(" Source: ");
+				}
+			} else {
+				System.out.println(" Source: " + source);
+				System.out.print(" Target: ");
+			}
 		}
-
+		if (abandon || match.isCheckMate()) {
+			winner(match);
+		}
 	}
 
-	public void printPiece(Piece piece, String background) {
+	private void printPiece(Piece piece, String background) {
 		if (piece == null) {
 			System.out.print(background + "   " + ANSI_RESET);
 		} else {
@@ -115,48 +120,55 @@ public class Prompt {
 		}
 	}
 
-	public void printCapturePieces(List<Piece> pieces) {
+	private void printCapturePieces(List<Piece> pieces) {
 		List<Piece> white = pieces.stream().filter(x -> x.getColor() == Color.WHITE).collect(Collectors.toList());
 		List<Piece> black = pieces.stream().filter(x -> x.getColor() == Color.BLACK).collect(Collectors.toList());
 		System.out.println("\n Captured Pieces");
-		System.out.print("  White: " + ANSI_CYAN_BACKGROUND + ANSI_WHITE);
+		System.out.print("  White: " + ANSI_BRIGHT_YELLOW_BACK + ANSI_WHITE);
 		System.out.println(Arrays.toString(white.toArray()));
 		System.out.print(ANSI_RESET + "  Black: " + ANSI_YELLOW_BACKGROUND + ANSI_BLACK);
 		System.out.println(Arrays.toString(black.toArray()));
 		System.out.println(ANSI_RESET);
 	}
 
-	public void printMatch(ChessMatch match) {
-		if (match.isCheck()) {
-			System.out.println(" " + ANSI_BLUE_BACKGROUND + " CHECK!!! " + ANSI_RESET);
-		}
+	private void printMatch(ChessMatch match) {
 		System.out.println(" Turn: " + match.getTurn());
 		System.out.println(" Waiting player: " + match.getCurrentPlayer() + "\n");
+		if (match.isCheckMate()) {
+			System.out.println(" " + ANSI_BLUE_BACKGROUND + " CHECKMATE!!! " + ANSI_RESET);
+		} else if (match.isCheck()) {
+			System.out.println(" " + ANSI_BLUE_BACKGROUND + " CHECK!!! " + ANSI_RESET);
+
+		}
 	}
 
-	public void printError(String e) {
-		System.out.print(" " + ANSI_RED + e + ANSI_RESET);
+	private void winner(ChessMatch match) {
+		String win = match.getCurrentPlayer() == Color.WHITE ? "  BLACK WINS!  " : "  WHITE WINS!  ";
+		System.out.println("\n\n " + ANSI_BLUE_BACKGROUND + win + ANSI_RESET);
+		System.out.println(" " + ANSI_BLUE_BACKGROUND + ANSI_GREEN + "  Game Over!!! " + ANSI_RESET);
 	}
 
 	public String promotionOption(Scanner sc) {
 		String type;
-		boolean repeat;
-		int count = 0;
+		int count = 3;
 		do {
 			System.out.print(" Choose a piece to exchange the pawn (Q, B, N, R): ");
 			type = sc.nextLine().toUpperCase();
 			if (!type.equals("Q") && !type.equals("B") && !type.equals("N") && !type.equals("R")) {
-				System.out.println(" Invalid option!");
-				repeat = true;
-				if (++count == 3) {
-					repeat = false;
+				System.out.println(" " + ANSI_RED + "Invalid option!" + ANSI_RESET);
+				if (--count == 0) {
 					type = "Q";
+					break;
 				}
 			} else {
-				repeat = false;
+				break;
 			}
-		} while (repeat);
+		} while (true);
 		return type;
+	}
+
+	public void printError(String e) {
+		System.out.print(" " + ANSI_RED + e + ANSI_RESET);
 	}
 
 }

@@ -11,13 +11,12 @@ public class Chess {
 		Scanner sc = new Scanner(System.in);
 		Prompt UI = new Prompt();
 		ChessMatch match = new ChessMatch();
-		int delay = 1200;
-		while (true) {
+		int delay = 1300;
+		while (!match.isCheckMate()) {
 			try {
 				UI.printBoard(match);
 				String source = UI.readPosition(sc);
 				if (source.equals("x")) {
-					UI.leave(match);
 					break;
 				}
 				match.validatePosition(source);	
@@ -47,7 +46,8 @@ public class Chess {
 				UI.printError(e.getMessage());
 				Thread.sleep(delay);				
 			}
-		}
+		}		
+		UI.printBoard(match);
 		sc.close();
 	}
 

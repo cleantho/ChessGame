@@ -45,13 +45,14 @@ public class Position {
 
 	public static boolean validatePosition(int row, int column) throws InputMismatchException {
 		if (row < 0 || row > 7 || column < 0 || column > 7)
-			throw new InputMismatchException("Non-existent position value. Valid values are from \"0\" to \"7\".");
+			throw new InputMismatchException("Non-existent position value. Valid values are from 0 to 7.");
 		return true;
 	}
 
 	public static boolean validatePosition(String position) throws InputMismatchException {
+		String errorMessage = "Non-existent position value. Valid values are from \"a1\" to \"h8\".";
 		if (position.length() > 2) {
-			throw new InputMismatchException("Non-existent position value. Valid values are from \"a1\" to \"h8\".");
+			throw new InputMismatchException(errorMessage);
 		}
 		char letter;
 		int digit;
@@ -59,10 +60,10 @@ public class Position {
 			letter = position.charAt(0);
 			digit = position.charAt(1);
 		} catch (StringIndexOutOfBoundsException e) {
-			throw new InputMismatchException("Non-existent position value. Valid values are from \"a1\" to \"h8\".");
+			throw new InputMismatchException(errorMessage);
 		}
 		if (letter < 'a' || letter > 'h' || digit < '1' || digit > '8') {
-			throw new InputMismatchException("Non-existent position value. Valid values are from \"a1\" to \"h8\".");
+			throw new InputMismatchException(errorMessage);
 		}
 		return true;
 	}
