@@ -25,9 +25,14 @@ public class ChessMatch {
 	public int getTurn() {
 		return turn;
 	}
-
+	
 	public boolean isCheck() {
 		return check;
+	}
+	
+	private void setCheck(boolean check) {
+		this.check = check;
+		board.setCheck(check);
 	}
 
 	public boolean isCheckMate() {
@@ -63,7 +68,7 @@ public class ChessMatch {
 			throw new ChessException("The chosen piece is not yours.");
 		}
 		if (!board.getPiece(pos).isThereAnyPossibleMove()) {
-			throw new ChessException("There is no possible moves for the chosen piece.");
+			throw new ChessException("There is no possible moves for the chosen piece\n or this move doesn't take your king out of check.");
 		}
 		return true;
 	}
@@ -117,11 +122,26 @@ public class ChessMatch {
 						promoted = true;
 					}
 					// end - treatment for Promotion
+					// treatment castling
+					int difference = s.getColumn() - t.getColumn();
+					if (p instanceof King && (difference > 1 || difference < -1)) {
+						// left side
+						int origin = 0;
+						Position destiny = new Position(s.getRow(), 3); 
+						// right side
+						if (difference == -2) {
+							destiny = new Position(s.getRow(), 5);
+							origin = 7;
+						}
+						board.addPiece(board.removePiece(new Position(s.getRow(), origin)), destiny);
+						board.getPiece(destiny).increaseMoveCount();
+					}
+					// end - treatment castling
 					board.addPiece(board.removePiece(s), t);
 					board.getPiece(t).increaseMoveCount();
 
 					// put opponent king in check
-					check = board.getOpponentKing(p.getColor()).isInCheck();
+					setCheck(board.getOpponentKing(p.getColor()).isInCheck());
 
 					// examine if it is checkmate
 					if (check) {
@@ -152,15 +172,15 @@ public class ChessMatch {
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("c7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("d7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("e7"));
-		board.addPiece(new Pawn(Color.BLACK, board), new Position("f7"));
+		//board.addPiece(new Pawn(Color.BLACK, board), new Position("f7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("g7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("h7"));
 
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("a2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("b2"));
-		board.addPiece(new Pawn(Color.WHITE, board), new Position("c2"));
+		 board.addPiece(new Pawn(Color.WHITE, board), new Position("c2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("d2"));
-		board.addPiece(new Pawn(Color.WHITE, board), new Position("e2"));
+		//board.addPiece(new Pawn(Color.WHITE, board), new Position("e2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("f2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("g2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("h2"));

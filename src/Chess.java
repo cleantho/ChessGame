@@ -11,7 +11,7 @@ public class Chess {
 		Scanner sc = new Scanner(System.in);
 		Prompt UI = new Prompt();
 		ChessMatch match = new ChessMatch();
-		int delay = 1300;
+		int delay = 1500;
 		while (!match.isCheckMate()) {
 			try {
 				UI.printBoard(match);

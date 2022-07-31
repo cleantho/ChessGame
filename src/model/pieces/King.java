@@ -33,6 +33,24 @@ public class King extends Piece {
 				}
 			}
 		}
+		// treatment castling
+		if (getMoveCount() == 0 && !board.isCheck()) {
+			int[] col = { -1, 1 };
+			p = new Position(row, column);
+			for (int i = 0; i < col.length; i++) {
+				while (p.setValues(row, p.getColumn() + col[i]) && getBoard().isEmpty(p)) {
+				}
+				if (p.setValues(row, p.getColumn()) && !getBoard().isEmpty(p)
+						&& (getBoard().getPiece(p) instanceof Rook) && (getBoard().getPiece(p).getMoveCount() == 0)) {
+					if (isMyKingInCheck(new Position(row, column + 2 * col[i]))) {
+						positions[row][column + 2 * col[i]] = false;
+					} else {
+						positions[row][column + 2 * col[i]] = true;
+					}
+				}
+				p.setValues(row, column);
+			}
+		}
 		return positions;
 	}
 

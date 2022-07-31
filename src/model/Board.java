@@ -6,9 +6,10 @@ public class Board {
 
 	private int rows;
 	private int columns;
+	private boolean check;
 	private Piece[][] pieces;
 	private King[] kings = new King[2];
-
+	
 	public Board() {
 		rows = columns = 8;
 		pieces = new Piece[rows][columns];
@@ -21,7 +22,15 @@ public class Board {
 	public int getColumns() {
 		return columns;
 	}
+	
+	public boolean isCheck() {
+		return check;
+	}
 
+	public void setCheck(boolean check) {
+		this.check = check;
+	}
+	
 	public Piece[][] getPieces() {
 		return pieces;
 	}

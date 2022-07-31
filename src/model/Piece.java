@@ -11,6 +11,7 @@ public abstract class Piece {
 	public Piece(Color color, Board board) {
 		this.color = color;
 		this.board = board;
+		moveCount = 0;
 	}
 
 	public Position getPosition() {
