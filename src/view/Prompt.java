@@ -10,6 +10,7 @@ import model.ChessMatch;
 import model.Color;
 import model.Piece;
 import model.Position;
+import model.Status;
 
 public class Prompt {
 	public static final String ANSI_ESC = "\u001B[27m";
@@ -34,8 +35,6 @@ public class Prompt {
 	public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
 	public static final String ANSI_BRIGHT_YELLOW_BACK = "\u001B[103m";
 
-	private boolean abandon = false;
-
 	private static void ClearConsole() {
 		System.out.print("\033[H\033[2J");
 		System.out.flush();
@@ -43,9 +42,7 @@ public class Prompt {
 
 	public String readPosition(Scanner sc) throws InputMismatchException {
 		String in = sc.nextLine().toLowerCase();
-		if (in.equals("x")) {
-			abandon = true;
-		} else {
+		if (!in.equals("x")) {
 			Position.validatePosition(in);
 		}
 		return in;
@@ -93,20 +90,20 @@ public class Prompt {
 		printMatch(match);
 		if (!match.isCheckMate()) {
 			if (source == "") {
-				System.out.println(" To leave the game press \"x\".");
-				if (abandon) {
-					System.out.print(" Source: x");
-				} else {
-					System.out.print(" Source: ");
+				if (match.getStatus() != Status.FIFTY_MOVES) {
+					System.out.println(" To leave the game press \"x\".");
+					if (match.getStatus() == Status.RESIGNING) {
+						System.out.print(" Source: x");
+					} else {
+						System.out.print(" Source: ");
+					}
 				}
 			} else {
 				System.out.println(" Source: " + source);
 				System.out.print(" Target: ");
 			}
 		}
-		if (abandon || match.isCheckMate()) {
-			winner(match);
-		}
+		winner(match);		
 	}
 
 	private void printPiece(Piece piece, String background) {
@@ -134,18 +131,39 @@ public class Prompt {
 	private void printMatch(ChessMatch match) {
 		System.out.println(" Turn: " + match.getTurn());
 		System.out.println(" Waiting player: " + match.getCurrentPlayer() + "\n");
-		if (match.isCheckMate()) {
-			System.out.println(" " + ANSI_BLUE_BACKGROUND + " CHECKMATE!!! " + ANSI_RESET);
-		} else if (match.isCheck()) {
-			System.out.println(" " + ANSI_BLUE_BACKGROUND + " CHECK!!! " + ANSI_RESET);
-
+		String msn = "";
+		switch (match.getStatus()) {
+		case RESIGNING:
+			msn = " " + ANSI_BLUE_BACKGROUND + " RESIGNING!!! " + ANSI_RESET;
+			break;
+		case STALEMATE:
+			msn = " " + ANSI_BLUE_BACKGROUND + " STALEMATE!!! " + ANSI_RESET;
+			break;
+		case FIFTY_MOVES:
+			msn = " " + ANSI_BLUE_BACKGROUND + " FIFTY-MOVES RULE!!! " + ANSI_RESET;
+			break;
+		case CHECKMATE:
+			msn = " " + ANSI_BLUE_BACKGROUND + " CHECKMATE!!! " + ANSI_RESET;
+			break;
+		case CHECK:
+			msn = " " + ANSI_BLUE_BACKGROUND + " CHECK!!! " + ANSI_RESET;
+			break;
+		case NORMAL:			
+			break;		
 		}
+		System.out.println(msn);
 	}
 
 	private void winner(ChessMatch match) {
-		String win = match.getCurrentPlayer() == Color.WHITE ? "  BLACK WINS!  " : "  WHITE WINS!  ";
-		System.out.println("\n\n " + ANSI_BLUE_BACKGROUND + win + ANSI_RESET);
-		System.out.println(" " + ANSI_BLUE_BACKGROUND + ANSI_GREEN + "  Game Over!!! " + ANSI_RESET);
+		Status st = match.getStatus();
+		if (st != Status.NORMAL && st != Status.CHECK) {
+			String win = match.getCurrentPlayer() == Color.WHITE ? "  BLACK WINS!  " : "  WHITE WINS!  ";
+			if (match.getStatus() == Status.STALEMATE || match.getStatus() == Status.FIFTY_MOVES) {
+				win = "    DRAWN!     ";
+			}
+			System.out.println("\n\n " + ANSI_BLUE_BACKGROUND + win + ANSI_RESET);
+			System.out.println(" " + ANSI_BLUE_BACKGROUND + ANSI_GREEN + "  Game Over!!! " + ANSI_RESET);
+		}
 	}
 
 	public String promotionOption(Scanner sc) {

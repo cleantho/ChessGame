@@ -8,17 +8,21 @@ import model.pieces.*;
 public class ChessMatch {
 
 	private int turn;
+	private int fiftyMoves;
 	private boolean check;
 	private boolean checkMate;
-	private boolean promoted;
+	private boolean promoted;	
+	private Status status;
 	private Piece enPassant;
 	private Board board;
-
+	
 	private List<Piece> capturedPieces = new ArrayList<>();
 
 	public ChessMatch() {
 		board = new Board();
 		turn = 1;
+		fiftyMoves = 0;
+		status = Status.NORMAL;
 		initialSetup();
 	}
 
@@ -26,10 +30,14 @@ public class ChessMatch {
 		return turn;
 	}
 	
+	public int getFiftyMoves() {
+		return fiftyMoves;
+	}
+
 	public boolean isCheck() {
 		return check;
 	}
-	
+
 	private void setCheck(boolean check) {
 		this.check = check;
 		board.setCheck(check);
@@ -41,6 +49,10 @@ public class ChessMatch {
 
 	public boolean isPromoted() {
 		return promoted;
+	}
+	
+	public Status getStatus() {
+		return status;
 	}
 
 	public Board getBoard() {
@@ -68,7 +80,8 @@ public class ChessMatch {
 			throw new ChessException("The chosen piece is not yours.");
 		}
 		if (!board.getPiece(pos).isThereAnyPossibleMove()) {
-			throw new ChessException("There is no possible moves for the chosen piece\n or this move doesn't take your king out of check.");
+			throw new ChessException(
+					"There is no possible moves for the chosen piece\n or this move doesn't take your king out of check.");
 		}
 		return true;
 	}
@@ -102,7 +115,7 @@ public class ChessMatch {
 			for (int j = 0; j < board.getColumns(); j++) {
 				if (possible[i][j] && t.getRow() == i && t.getColumn() == j) {
 					if (!board.isEmpty(t)) {
-						capturedPieces.add(board.removePiece(t));
+						capturedPieces.add(board.removePiece(t));						
 					} else {// treatment for Enpassant
 						if (p instanceof Pawn && (s.getColumn() != t.getColumn())) {
 							capturedPieces.add(board.removePiece(new Position(s.getRow(), t.getColumn())));
@@ -127,7 +140,7 @@ public class ChessMatch {
 					if (p instanceof King && (difference > 1 || difference < -1)) {
 						// left side
 						int origin = 0;
-						Position destiny = new Position(s.getRow(), 3); 
+						Position destiny = new Position(s.getRow(), 3);
 						// right side
 						if (difference == -2) {
 							destiny = new Position(s.getRow(), 5);
@@ -137,6 +150,14 @@ public class ChessMatch {
 						board.getPiece(destiny).increaseMoveCount();
 					}
 					// end - treatment castling
+					// draw for fifty-moves rule
+					if (p instanceof Pawn || !board.isEmpty(t)) {
+						fiftyMoves = 0;
+					} else {
+						fiftyMoves++;
+					}
+					// end - draw for fifty-moves rule
+					
 					board.addPiece(board.removePiece(s), t);
 					board.getPiece(t).increaseMoveCount();
 
@@ -144,10 +165,9 @@ public class ChessMatch {
 					setCheck(board.getOpponentKing(p.getColor()).isInCheck());
 
 					// examine if it is checkmate
-					if (check) {
-						checkMate = board.getOpponentKing(p.getColor()).isInCheckmate();
-					}
-
+					checkMate = board.getOpponentKing(p.getColor()).isInCheckmate();
+					
+					statusGame();
 					turn++;
 					return true;
 				}
@@ -155,6 +175,25 @@ public class ChessMatch {
 		}
 
 		throw new ChessException("The chosen piece can't move to target position.");
+	}
+
+	private void statusGame() {
+		if (checkMate && !check) {
+			status = Status.STALEMATE;
+		} else if (!checkMate && fiftyMoves == 100) {
+			status = Status.FIFTY_MOVES;
+		} else if (checkMate) {
+			status = Status.CHECKMATE;
+		} else if (check) {
+			status = Status.CHECK;
+		} else {
+			status = Status.NORMAL;
+		}
+	}
+	
+
+	public void resigning() {
+		status = Status.RESIGNING;		
 	}
 
 	private void initialSetup() {
@@ -173,12 +212,12 @@ public class ChessMatch {
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("d7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("e7"));
 		//board.addPiece(new Pawn(Color.BLACK, board), new Position("f7"));
-		board.addPiece(new Pawn(Color.BLACK, board), new Position("g7"));
+		//board.addPiece(new Pawn(Color.BLACK, board), new Position("g7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("h7"));
 
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("a2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("b2"));
-		 board.addPiece(new Pawn(Color.WHITE, board), new Position("c2"));
+		board.addPiece(new Pawn(Color.WHITE, board), new Position("c2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("d2"));
 		//board.addPiece(new Pawn(Color.WHITE, board), new Position("e2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("f2"));

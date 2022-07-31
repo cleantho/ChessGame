@@ -3,6 +3,7 @@ import java.util.Scanner;
 
 import model.ChessException;
 import model.ChessMatch;
+import model.Status;
 import view.Prompt;
 
 public class Chess {
@@ -17,6 +18,7 @@ public class Chess {
 				UI.printBoard(match);
 				String source = UI.readPosition(sc);
 				if (source.equals("x")) {
+					match.resigning();
 					break;
 				}
 				match.validatePosition(source);	
@@ -38,6 +40,9 @@ public class Chess {
 				if (match.isPromoted()) {
 					String type = UI.promotionOption(sc);
 					match.replacePromotedPiece(type, target);
+				}
+				if(match.getStatus() == Status.FIFTY_MOVES) {
+					break;
 				}
 			} catch (InputMismatchException e) {
 				UI.printError(e.getMessage());
