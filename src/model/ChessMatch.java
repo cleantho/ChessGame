@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import model.pieces.*;
 
@@ -11,12 +12,13 @@ public class ChessMatch {
 	private int fiftyMoves;
 	private boolean check;
 	private boolean checkMate;
-	private boolean promoted;	
+	private boolean promoted;
 	private Status status;
 	private Piece enPassant;
 	private Board board;
-	
+
 	private List<Piece> capturedPieces = new ArrayList<>();
+	private List<String> moves = new ArrayList<>();
 
 	public ChessMatch() {
 		board = new Board();
@@ -29,7 +31,7 @@ public class ChessMatch {
 	public int getTurn() {
 		return turn;
 	}
-	
+
 	public int getFiftyMoves() {
 		return fiftyMoves;
 	}
@@ -50,7 +52,7 @@ public class ChessMatch {
 	public boolean isPromoted() {
 		return promoted;
 	}
-	
+
 	public Status getStatus() {
 		return status;
 	}
@@ -115,7 +117,7 @@ public class ChessMatch {
 			for (int j = 0; j < board.getColumns(); j++) {
 				if (possible[i][j] && t.getRow() == i && t.getColumn() == j) {
 					if (!board.isEmpty(t)) {
-						capturedPieces.add(board.removePiece(t));						
+						capturedPieces.add(board.removePiece(t));
 					} else {// treatment for Enpassant
 						if (p instanceof Pawn && (s.getColumn() != t.getColumn())) {
 							capturedPieces.add(board.removePiece(new Position(s.getRow(), t.getColumn())));
@@ -157,7 +159,7 @@ public class ChessMatch {
 						fiftyMoves++;
 					}
 					// end - draw for fifty-moves rule
-					
+
 					board.addPiece(board.removePiece(s), t);
 					board.getPiece(t).increaseMoveCount();
 
@@ -166,8 +168,11 @@ public class ChessMatch {
 
 					// examine if it is checkmate
 					checkMate = board.getOpponentKing(p.getColor()).isInCheckmate();
-					
-					statusGame();
+					// Threefold repetition rule
+					String pass = builder();
+					moves.add(pass);
+					// end
+					statusGame(pass);
 					turn++;
 					return true;
 				}
@@ -177,7 +182,22 @@ public class ChessMatch {
 		throw new ChessException("The chosen piece can't move to target position.");
 	}
 
-	private void statusGame() {
+	private String builder() {
+		String result = "";
+		Piece[][] pieces = board.getPieces();
+		for (int i = 0; i < board.getRows(); i++) {
+			for (int j = 0; j < board.getColumns(); j++) {
+				if (pieces[i][j] != null) {
+					result += pieces[i][j].signature();
+				} else {
+					result += "E"; // Empty
+				}
+			}
+		}
+		return result;
+	}
+
+	private void statusGame(String pass) {
 		if (checkMate && !check) {
 			status = Status.STALEMATE;
 		} else if (!checkMate && fiftyMoves == 100) {
@@ -189,11 +209,14 @@ public class ChessMatch {
 		} else {
 			status = Status.NORMAL;
 		}
+		List<String> list = moves.stream().filter(x -> x.equals(pass)).collect(Collectors.toList());
+		if (list.size() >= 3) {
+			status = Status.THREEFOLD_REPETITION;
+		}
 	}
-	
 
 	public void resigning() {
-		status = Status.RESIGNING;		
+		status = Status.RESIGNING;
 	}
 
 	private void initialSetup() {
@@ -211,15 +234,15 @@ public class ChessMatch {
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("c7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("d7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("e7"));
-		//board.addPiece(new Pawn(Color.BLACK, board), new Position("f7"));
-		//board.addPiece(new Pawn(Color.BLACK, board), new Position("g7"));
+		board.addPiece(new Pawn(Color.BLACK, board), new Position("f7"));
+		board.addPiece(new Pawn(Color.BLACK, board), new Position("g7"));
 		board.addPiece(new Pawn(Color.BLACK, board), new Position("h7"));
 
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("a2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("b2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("c2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("d2"));
-		//board.addPiece(new Pawn(Color.WHITE, board), new Position("e2"));
+		board.addPiece(new Pawn(Color.WHITE, board), new Position("e2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("f2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("g2"));
 		board.addPiece(new Pawn(Color.WHITE, board), new Position("h2"));

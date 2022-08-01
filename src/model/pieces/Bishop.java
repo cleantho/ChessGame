@@ -20,9 +20,9 @@ public class Bishop extends Piece {
 	public boolean[][] possibleMoves() {
 		boolean[][] positions = new boolean[board.getRows()][board.getColumns()];
 		int row = position.getRow();
-		int column = position.getColumn();		
-		int[] r = { -1, -1, 1, 1};
-		int[] c = { -1, 1, -1, 1};
+		int column = position.getColumn();
+		int[] r = { -1, -1, 1, 1 };
+		int[] c = { -1, 1, -1, 1 };
 		Position p = new Position(row, column);
 		for (int i = 0; i < r.length; i++) {
 			while (p.setValues(p.getRow() + r[i], p.getColumn() + c[i]) && getBoard().isEmpty(p)) {
@@ -38,7 +38,7 @@ public class Bishop extends Piece {
 				} else {
 					positions[p.getRow()][p.getColumn()] = true;
 				}
-			}			
+			}
 			p.setValues(row, column);
 		}
 		return positions;

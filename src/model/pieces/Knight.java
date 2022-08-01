@@ -25,7 +25,7 @@ public class Knight extends Piece {
 		int[] c = { -1, 1, -1, 1, -2, -2, 2, 2 };
 		Position p = new Position(row, column);
 		for (int i = 0; i < r.length; i++) {
-			if (p.setValues(row + r[i], column + c[i]) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {				
+			if (p.setValues(row + r[i], column + c[i]) && (getBoard().isEmpty(p) || isThereOpponentPiece(p))) {
 				if (isMyKingInCheck(p)) {
 					positions[p.getRow()][p.getColumn()] = false;
 				} else {

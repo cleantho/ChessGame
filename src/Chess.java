@@ -21,37 +21,37 @@ public class Chess {
 					match.resigning();
 					break;
 				}
-				match.validatePosition(source);	
+				match.validatePosition(source);
 				String target = "";
 				do {
 					try {
 						UI.printBoard(match, source);
-						target = UI.readPosition(sc);						
+						target = UI.readPosition(sc);
 						match.movePiece(source, target);
 						break;
 					} catch (InputMismatchException e) {
 						UI.printError(e.getMessage());
-						Thread.sleep(delay);						
+						Thread.sleep(delay);
 					} catch (ChessException e) {
 						UI.printError(e.getMessage());
-						Thread.sleep(delay);						
+						Thread.sleep(delay);
 					}
 				} while (true);
 				if (match.isPromoted()) {
 					String type = UI.promotionOption(sc);
 					match.replacePromotedPiece(type, target);
 				}
-				if(match.getStatus() == Status.FIFTY_MOVES) {
+				if (match.getStatus() == Status.FIFTY_MOVES || match.getStatus() == Status.THREEFOLD_REPETITION) {
 					break;
 				}
 			} catch (InputMismatchException e) {
 				UI.printError(e.getMessage());
-				Thread.sleep(delay);				
+				Thread.sleep(delay);
 			} catch (ChessException e) {
 				UI.printError(e.getMessage());
-				Thread.sleep(delay);				
+				Thread.sleep(delay);
 			}
-		}		
+		}
 		UI.printBoard(match);
 		sc.close();
 	}

@@ -64,7 +64,7 @@ public abstract class Piece {
 		boolean result = false;
 		King king = board.getMyKing(color);
 		Piece[][] pieces = board.getPieces();
-		
+
 		Position aux = position;
 		Piece pieceRemoved = null;
 		if (!board.isEmpty(target)) {
@@ -158,6 +158,20 @@ public abstract class Piece {
 			board.addPiece(pieceRemoved, new Position(target.getRow(), target.getColumn()));
 		}
 
+		return result;
+	}
+
+	public String signature() {
+		String result = toString() + (color == Color.WHITE ? "w" : "b") + position.getRow() + position.getColumn();
+		if (this instanceof Pawn && ((Pawn) this).isEnPassant()) {
+			result += "ep";
+		}
+		if (this instanceof Rook && ((Rook) this).getMoveCount() == 0) {
+			result += "c";
+		}
+		if (this instanceof King && ((King) this).getMoveCount() == 0) {
+			result += "c";
+		}
 		return result;
 	}
 

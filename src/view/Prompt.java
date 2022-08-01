@@ -90,7 +90,7 @@ public class Prompt {
 		printMatch(match);
 		if (!match.isCheckMate()) {
 			if (source == "") {
-				if (match.getStatus() != Status.FIFTY_MOVES) {
+				if (match.getStatus() != Status.FIFTY_MOVES && match.getStatus() != Status.THREEFOLD_REPETITION) {
 					System.out.println(" To leave the game press \"x\".");
 					if (match.getStatus() == Status.RESIGNING) {
 						System.out.print(" Source: x");
@@ -103,7 +103,7 @@ public class Prompt {
 				System.out.print(" Target: ");
 			}
 		}
-		winner(match);		
+		winner(match);
 	}
 
 	private void printPiece(Piece piece, String background) {
@@ -130,26 +130,29 @@ public class Prompt {
 
 	private void printMatch(ChessMatch match) {
 		System.out.println(" Turn: " + match.getTurn());
-		System.out.println(" Waiting player: " + match.getCurrentPlayer() + "\n");
+		System.out.println(" Waiting player: " + match.getCurrentPlayer());
 		String msn = "";
 		switch (match.getStatus()) {
 		case RESIGNING:
-			msn = " " + ANSI_BLUE_BACKGROUND + " RESIGNING!!! " + ANSI_RESET;
+			msn = "\n " + ANSI_BLUE_BACKGROUND + " RESIGNING!!! " + ANSI_RESET;
 			break;
 		case STALEMATE:
-			msn = " " + ANSI_BLUE_BACKGROUND + " STALEMATE!!! " + ANSI_RESET;
+			msn = "\n " + ANSI_BLUE_BACKGROUND + " STALEMATE!!! " + ANSI_RESET;
 			break;
 		case FIFTY_MOVES:
-			msn = " " + ANSI_BLUE_BACKGROUND + " FIFTY-MOVES RULE!!! " + ANSI_RESET;
+			msn = "\n " + ANSI_BLUE_BACKGROUND + " FIFTY-MOVES RULE!!! " + ANSI_RESET;
+			break;
+		case THREEFOLD_REPETITION:
+			msn = "\n " + ANSI_BLUE_BACKGROUND + " THREEFOLD REPETITION!!! " + ANSI_RESET;
 			break;
 		case CHECKMATE:
-			msn = " " + ANSI_BLUE_BACKGROUND + " CHECKMATE!!! " + ANSI_RESET;
+			msn = "\n " + ANSI_BLUE_BACKGROUND + " CHECKMATE!!! " + ANSI_RESET;
 			break;
 		case CHECK:
-			msn = " " + ANSI_BLUE_BACKGROUND + " CHECK!!! " + ANSI_RESET;
+			msn = "\n " + ANSI_BLUE_BACKGROUND + " CHECK!!! " + ANSI_RESET;
 			break;
-		case NORMAL:			
-			break;		
+		case NORMAL:
+			break;
 		}
 		System.out.println(msn);
 	}
@@ -158,7 +161,8 @@ public class Prompt {
 		Status st = match.getStatus();
 		if (st != Status.NORMAL && st != Status.CHECK) {
 			String win = match.getCurrentPlayer() == Color.WHITE ? "  BLACK WINS!  " : "  WHITE WINS!  ";
-			if (match.getStatus() == Status.STALEMATE || match.getStatus() == Status.FIFTY_MOVES) {
+			if (match.getStatus() == Status.STALEMATE || match.getStatus() == Status.FIFTY_MOVES
+					|| match.getStatus() == Status.THREEFOLD_REPETITION) {
 				win = "    DRAWN!     ";
 			}
 			System.out.println("\n\n " + ANSI_BLUE_BACKGROUND + win + ANSI_RESET);

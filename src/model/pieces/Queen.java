@@ -38,7 +38,7 @@ public class Queen extends Piece {
 				} else {
 					positions[p.getRow()][p.getColumn()] = true;
 				}
-			}			
+			}
 			p.setValues(row, column);
 		}
 		return positions;

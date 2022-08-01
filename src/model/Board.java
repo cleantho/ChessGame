@@ -9,7 +9,7 @@ public class Board {
 	private boolean check;
 	private Piece[][] pieces;
 	private King[] kings = new King[2];
-	
+
 	public Board() {
 		rows = columns = 8;
 		pieces = new Piece[rows][columns];
@@ -22,7 +22,7 @@ public class Board {
 	public int getColumns() {
 		return columns;
 	}
-	
+
 	public boolean isCheck() {
 		return check;
 	}
@@ -30,7 +30,7 @@ public class Board {
 	public void setCheck(boolean check) {
 		this.check = check;
 	}
-	
+
 	public Piece[][] getPieces() {
 		return pieces;
 	}
@@ -49,7 +49,7 @@ public class Board {
 			return kings[1];
 		}
 	}
-	
+
 	public King getOpponentKing(Color color) {
 		if (color == Color.WHITE) {
 			return kings[1];
