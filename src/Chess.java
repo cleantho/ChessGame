@@ -4,13 +4,18 @@ import java.util.Scanner;
 import model.ChessException;
 import model.ChessMatch;
 import model.Status;
+import view.Eclipse;
+import view.GameInterface;
 import view.Prompt;
 
 public class Chess {
 
 	public static void main(String[] args) throws InterruptedException {
 		Scanner sc = new Scanner(System.in);
-		Prompt UI = new Prompt();
+		GameInterface UI = new Prompt();
+		if (System.console() == null) {
+			UI = new Eclipse();
+		}
 		ChessMatch match = new ChessMatch();
 		int delay = 1500;
 		while (!match.isCheckMate()) {

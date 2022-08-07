@@ -12,7 +12,7 @@ import model.Piece;
 import model.Position;
 import model.Status;
 
-public class Prompt {
+public class Prompt implements GameInterface {
 	public static final String ANSI_ESC = "\u001B[27m";
 	public static final String ANSI_RESET = "\u001B[0m";
 	public static final String ANSI_BLACK = "\u001B[30m";
@@ -40,6 +40,7 @@ public class Prompt {
 		System.out.flush();
 	}
 
+	@Override
 	public String readPosition(Scanner sc) throws InputMismatchException {
 		String in = sc.nextLine().toLowerCase();
 		if (!in.equals("x")) {
@@ -48,10 +49,12 @@ public class Prompt {
 		return in;
 	}
 
+	@Override
 	public void printBoard(ChessMatch match) {
 		printBoard(match, "");
 	}
 
+	@Override
 	public void printBoard(ChessMatch match, String source) {
 		ClearConsole();
 		Piece[][] pieces = match.getBoard().getPieces();
@@ -170,6 +173,7 @@ public class Prompt {
 		}
 	}
 
+	@Override
 	public String promotionOption(Scanner sc) {
 		String type;
 		int count = 3;
@@ -189,6 +193,7 @@ public class Prompt {
 		return type;
 	}
 
+	@Override
 	public void printError(String e) {
 		System.out.print(" " + ANSI_RED + e + ANSI_RESET);
 	}
